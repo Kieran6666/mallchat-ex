@@ -1,7 +1,8 @@
 package com.kieran.mallchat.common.user.service;
 
+
 import com.kieran.mallchat.common.user.domain.entity.User;
-import com.baomidou.mybatisplus.extension.service.IService;
+import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 
 /**
  * <p>
@@ -11,6 +12,14 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author <a href="https://github.com/zongzibinbin">abin</a>
  * @since 2024-04-23
  */
-public interface IUserService extends IService<User> {
+public interface UserService {
+
+    User getByOpenId(String openId);
+
+    Long register(User user);
+
+    User getByUid(Long uid);
+
+
 
 }

@@ -25,7 +25,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 /**
- * @Configuration 必须加上 否则该类不会被家在
+ * @Configuration 必须加上 否则该类不会被加载
  */
 @Slf4j
 @Configuration
@@ -83,7 +83,7 @@ public class NettyWebSocketServer {
                         ChannelPipeline pipeline = socketChannel.pipeline();
 
                         // 心跳检测，每30秒检测一次客户端发送来的心跳请求，客户端每10秒向服务端发送一次心跳请求
-                        pipeline.addLast(new IdleStateHandler(30, 0, 0));
+                        pipeline.addLast(new IdleStateHandler(300, 0, 0));
 
                         // WebSocket要通过HTTP协议升级，且要在HTTP中获取用户IP地址
                         pipeline.addLast(new HttpServerCodec());
@@ -98,7 +98,7 @@ public class NettyWebSocketServer {
                         pipeline.addLast(new HttpObjectAggregator(1024 * 8));
 
                         // 保存用户IP
-//                        pipeline.addLast(new HttpRequestHandler());
+                        pipeline.addLast(new HttpRequestHandler());
 
                         /**
                          * HTTP协议升级WebSocket协议，必须放在Http处理流程之后，因为升级协议后，不会保留用户IP

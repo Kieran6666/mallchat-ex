@@ -20,7 +20,6 @@ public enum WSReqTypeEnum {
     private final Integer type;
     private final String desc;
 
-    // TODO:: 为什么要有这个
     private static Map<Integer, WSReqTypeEnum> cache;
 
     static {

@@ -2,7 +2,6 @@ package com.kieran.mallchat.common.user.dao;
 
 import com.kieran.mallchat.common.user.domain.entity.User;
 import com.kieran.mallchat.common.user.mapper.UserMapper;
-import com.kieran.mallchat.common.user.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -17,4 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserDao extends ServiceImpl<UserMapper, User> {
 
+    public User getByOpenId(String openId) {
+        return lambdaQuery().eq(User::getOpenId, openId).one();
+    }
 }
