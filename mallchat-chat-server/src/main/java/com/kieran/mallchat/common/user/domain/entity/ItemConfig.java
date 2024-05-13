@@ -43,9 +43,9 @@ public class ItemConfig implements Serializable {
     private String img;
 
     /**
-     * 物品功能描述
+     * 物品功能描述  describe在sql里是关键字，所以要加上``
      */
-    @TableField("describe")
+    @TableField("`describe`")
     private String describe;
 
     /**

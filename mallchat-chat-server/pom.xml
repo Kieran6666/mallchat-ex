@@ -52,5 +52,11 @@
             <artifactId>java-jwt</artifactId>
             <version>3.19.0</version>
         </dependency>
+        <!--            明文密码加密-->
+        <dependency>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot-starter</artifactId>
+            <version>3.0.4</version>
+        </dependency>
     </dependencies>
 </project>
