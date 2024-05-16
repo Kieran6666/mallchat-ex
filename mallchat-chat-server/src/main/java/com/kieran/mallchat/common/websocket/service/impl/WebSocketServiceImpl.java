@@ -4,9 +4,12 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.kieran.mallchat.common.common.event.UserOnlineEvent;
+import com.kieran.mallchat.common.user.domain.entity.IpInfo;
 import com.kieran.mallchat.common.user.domain.entity.User;
 import com.kieran.mallchat.common.user.service.LoginService;
 import com.kieran.mallchat.common.user.service.UserService;
+import com.kieran.mallchat.common.websocket.NettyUtil;
 import com.kieran.mallchat.common.websocket.domain.dto.WSChannelExtraDTO;
 import com.kieran.mallchat.common.websocket.domain.vo.resp.WSBaseResp;
 import com.kieran.mallchat.common.websocket.service.WebSocketService;
@@ -17,11 +20,13 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.time.Duration;
+import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -63,6 +68,9 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Resource
     private LoginService loginService;
 
+    @Resource
+    private ApplicationEventPublisher applicationEventPublisher;
+
     @Override
     public void connect(Channel channel) {
         ONLINE_WS_MAP.put(channel, new WSChannelExtraDTO());
@@ -100,8 +108,6 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     /**
      * 这里可以使用《JWT 双TOKEN的解决办法》，必须研究一下
-     * @param loginCode
-     * @param uid
      */
     @Override
     public Boolean scanLoginSuccess(Integer loginCode, Long uid) {
@@ -117,10 +123,22 @@ public class WebSocketServiceImpl implements WebSocketService {
         // 调用用户登陆模块
         String token = loginService.login(uid);
 
+        ONLINE_WS_MAP.get(channel).setUid(uid);
+
+
         // TODO:: power
         boolean power = false;
 
+
         sendMsg(channel, WebSocketAdapter.buildLoginSuccessResp(user, token, power));
+
+        // 认证成功时，更新用户的ip地址
+        user.setLastOptTime(new Date());
+        user.refreshIp(NettyUtil.getAttr(channel, NettyUtil.IP));
+
+        // 发送用户上线事件
+        applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
+
         return Boolean.TRUE;
     }
 
